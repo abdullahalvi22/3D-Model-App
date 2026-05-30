@@ -7,8 +7,8 @@ plugins {
 
 android {
     namespace = "com.example.model_app"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 36
+    ndkVersion = "25.2.9519653"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -24,10 +24,14 @@ android {
         applicationId = "com.example.model_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        ndk {
+            abiFilters += listOf("arm64-v8a","x86_64")
+        }
     }
 
     buildTypes {
@@ -37,6 +41,22 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    sourceSets {
+        getByName("main") {
+            assets.srcDirs("src/main/assets")
+        }
+    }
+}
+
+dependencies {
+    val filamentVersion = "1.71.4"
+
+    implementation("com.google.android.filament:filament-android:$filamentVersion")
+    implementation("com.google.android.filament:gltfio-android:$filamentVersion")
+    implementation("com.google.android.filament:filament-utils-android:$filamentVersion")
+
+    // implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }
 
 flutter {
