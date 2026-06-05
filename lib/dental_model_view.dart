@@ -21,12 +21,12 @@ import 'package:model_app/dental_model_channel.dart';
 class DentalModelView extends StatefulWidget {
   const DentalModelView({
     super.key,
-    this.assetName = 'patient_model.glb',
-    this.onViewCreated,
+    required this.assetName,
+    required this.onViewCreated,
   });
 
   final String assetName;
-  final void Function(DentalModelChannel channel)? onViewCreated;
+  final void Function(DentalModelChannel channel) onViewCreated;
 
   @override
   State<DentalModelView> createState() => _DentalModelViewState();
@@ -130,6 +130,6 @@ class _DentalModelViewState extends State<DentalModelView> {
   void _onPlatformViewCreated(int viewId) {
     final channel = DentalModelChannel(viewId);
     _channel = channel;
-    widget.onViewCreated?.call(channel);
+    widget.onViewCreated.call(channel);
   }
 }

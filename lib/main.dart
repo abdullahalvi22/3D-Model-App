@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:model_app/filament_screen.dart';
 import 'package:model_app/patient_viewer_screen.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '3D Model App',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: const PatientViewerScreen(),
+      home: const FilamentScreen(),
     );
   }
 }
