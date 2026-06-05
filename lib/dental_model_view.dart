@@ -36,8 +36,10 @@ class _DentalModelViewState extends State<DentalModelView> {
   DentalModelChannel? _channel;
 
   // Gesture tracking
-  Offset? _lastPanPosition;
-  double? _lastScale;
+  // Offset? _lastPanPosition;
+  // double? _lastScale;
+  double _lastScale = 1.0;
+  int _lastPointerCount = 0;
 
   static const String _viewType = 'com.example.model_app/dental_model_view';
 
@@ -45,33 +47,52 @@ class _DentalModelViewState extends State<DentalModelView> {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      // ── Pan → orbit ────────────────────────────────────────────────────
-      onPanStart: (details) {
-        _lastPanPosition = details.localPosition;
-      },
-      onPanUpdate: (details) {
-        final last = _lastPanPosition;
-        if (last == null) return;
-        final delta = details.localPosition - last;
-        _lastPanPosition = details.localPosition;
 
-        // Scale pixel delta to orbit degrees
-        const sensitivity = 0.3;
-        _channel?.orbitCamera(delta.dx * sensitivity, -delta.dy * sensitivity);
-      },
-      onPanEnd: (_) => _lastPanPosition = null,
-
-      // ── Scale → zoom ───────────────────────────────────────────────────
+      // Scale handles both:
+      // 1 finger  -> orbit
+      // 2 fingers -> pinch zoom
       onScaleStart: (details) {
-        // _lastScale = details.scale;
+        _lastScale = 1.0;
+        _lastPointerCount = details.pointerCount;
       },
+
       onScaleUpdate: (details) {
-        final last = _lastScale ?? 1.0;
-        final delta = details.scale - last;
-        _lastScale = details.scale;
-        _channel?.zoomCamera(delta * 5.0);
+        const orbitSensitivity = 0.3;
+        const zoomSensitivity = 5.0;
+
+        // Reset scale baseline when the number of fingers changes.
+        // This avoids a zoom jump when the second finger lands.
+        if (details.pointerCount != _lastPointerCount) {
+          _lastPointerCount = details.pointerCount;
+          _lastScale = details.scale;
+          return;
+        }
+
+        // ── One finger drag → orbit ─────────────────────────────────────────
+        if (details.pointerCount == 1) {
+          final delta = details.focalPointDelta;
+
+          _channel?.orbitCamera(
+            delta.dx * orbitSensitivity,
+            -delta.dy * orbitSensitivity,
+          );
+
+          return;
+        }
+
+        // ── Two or more fingers → pinch zoom ────────────────────────────────
+        if (details.pointerCount >= 2) {
+          final scaleDelta = details.scale - _lastScale;
+          _lastScale = details.scale;
+
+          _channel?.zoomCamera(scaleDelta * zoomSensitivity);
+        }
       },
-      onScaleEnd: (_) => _lastScale = null,
+
+      onScaleEnd: (_) {
+        _lastScale = 1.0;
+        _lastPointerCount = 0;
+      },
 
       child: _buildPlatformView(),
     );

@@ -225,6 +225,12 @@ class FilamentRenderer(
         )
     }
 
+    fun resetCamera() {
+        orbitTheta = 0.0
+        orbitPhi   = 15.0
+        applyCameraOrbit()
+    }
+
     private var orbitTheta  = 0.0   // horizontal angle (degrees)
     private var orbitPhi    = 15.0  // vertical angle   (degrees)
     private var orbitRadius = 0.5
